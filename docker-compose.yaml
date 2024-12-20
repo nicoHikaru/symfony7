@@ -1,0 +1,67 @@
+version: '3.8' 
+services:
+    db: 
+        image: mysql:5.7 
+        container_name: mysql 
+        command: --default-authentication-plugin=mysql_native_password 
+        restart: always 
+        volumes: 
+            - db-data:/var/lib/mysql 
+        environment: 
+            MYSQL_ROOT_PASSWORD: teste 
+        ports: 
+            - "3306:3306" 
+        networks: 
+            - dev 
+        labels: 
+            - "com.example.service=db"
+    
+    phpmyadmin:
+        image: phpmyadmin
+        container_name: phpmyadmin 
+        restart: always 
+        ports: 
+            - "8080:80"
+        environment: 
+            PMA_HOST: db
+        depends_on: 
+            - db 
+        networks: 
+            - dev
+        labels: 
+            - "com.example.service=phpmyadmin"
+
+    maildev: 
+        image: maildev/maildev
+        container_name: maildev
+        command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+        ports: 
+            - "8081:80"
+        restart: always
+        networks: 
+            - dev 
+        labels: 
+            - "com.example.service=maildev"
+    
+    www: 
+        build: 
+            context: ./php
+        container_name: social
+        ports: 
+            - "8741:80" 
+        volumes: 
+            - ./php/vhosts:/etc/apache2/sites-enabled
+            - ./:/var/www 
+            #- /etc/letsencrypt/live/kotolearn.com/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
+            #- /etc/letsencrypt/live/kotolearn.com/privkey.pem:/etc/ssl/private/privkey.pem:ro
+        restart: always 
+        depends_on: 
+            - db 
+        networks: 
+            - dev
+        labels: 
+            - "com.example.service=www"
+networks:
+    dev:
+volumes:
+    db-data:
