@@ -2,14 +2,20 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\UserService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class HomeController extends AbstractController
 {
+
+    public function __construct(private UserService $userService){}
+
     #[Route('/home', name: 'app_home')]
-    public function index(): Response
+    public function index(EntityManagerInterface $entityManager): Response
     {
 
         /* 
@@ -22,6 +28,10 @@ class HomeController extends AbstractController
             INNER JOIN departement on departement.id = city_departement.departement_id where user.email like "%@gmail%" and departement.name = "var" and city.name like "saint%"
         
         */
+        /* $limit = 3000;
+        $this->userService->insertFakeData($entityManager,$limit); */
+        dd('ok');
+        dd($this->userService->getUsersById([4001,3]));
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
         ]);

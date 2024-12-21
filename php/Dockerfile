@@ -1,4 +1,4 @@
-FROM php:8.1.0-apache
+FROM php:8.4.1-apache
 LABEL maintainer="votre-email@example.com"
 LABEL description="Image PHP avec Apache, Composer, Yarn et Node.js" 
 

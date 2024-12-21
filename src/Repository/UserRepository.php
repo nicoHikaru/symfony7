@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -31,6 +32,59 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function getAllUser():array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addEntityResult(User::class, 'u');
+        $rsm->addFieldResult('u', 'id', 'id');
+        $rsm->addFieldResult('u', 'email', 'email');
+
+        $sql = '
+            SELECT id, email FROM user
+        ';
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+
+        return $query->getResult();
+        
+    }
+
+    public function getUserById(int $id):array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addEntityResult(User::class, 'u');
+        $rsm->addFieldResult('u', 'id', 'id');
+        $rsm->addFieldResult('u', 'email', 'email');
+
+        $sql = '
+            SELECT id, email FROM user WHERE id = :id
+        ';
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('id', $id);
+
+        return $query->getResult();
+        
+    }
+
+    public function getUserSById(array $id):array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addEntityResult(User::class, 'u');
+        $rsm->addFieldResult('u', 'id', 'id');
+        $rsm->addFieldResult('u', 'email', 'email');
+
+        $sql = '
+            SELECT id, email FROM user WHERE id in (:id)
+        ';
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('id', $id);
+
+        return $query->getResult();
+        
     }
 
     //    /**
