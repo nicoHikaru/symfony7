@@ -17,7 +17,7 @@ services:
     
     phpmyadmin:
         image: phpmyadmin
-        container_name: phpmyadmin 
+        container_name: phpmyadmin_symfony
         restart: always 
         ports: 
             - "8080:80"
